@@ -1,78 +1,20 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Malla Curricular Interactiva – Plan Personal</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8">
+  <title>Malla Interactiva TEC</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-gray-100 min-h-screen p-6">
+<body>
 
-  <h1 class="text-3xl font-bold mb-4">📘 Malla Curricular Interactiva – Uso Personal</h1>
-  <p class="mb-6 text-gray-700">Marca los cursos aprobados y la malla te mostrará cuáles están disponibles y cuáles siguen bloqueados.</p>
+<h1>🎮 Malla Interactiva – Ingeniería de Software</h1>
+<p>Haz clic en un curso disponible para aprobarlo.</p>
 
-  <div id="malla" class="grid md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+<div id="malla"></div>
 
-  <script>
-    const cursos = [
-      { id: 'CI0200', nombre: 'Examen diagnóstico', req: [] },
-      { id: 'CI0202', nombre: 'Inglés básico', req: [] },
-      { id: 'MA0101', nombre: 'Matemática general', req: [] },
-      { id: 'CI1106', nombre: 'Comunicación escrita', req: [] },
-      { id: 'MA1403', nombre: 'Matemática discreta', req: [] },
-      { id: 'IC1400', nombre: 'Fundamentos de organización de computadoras', req: [] },
-      { id: 'IC1802', nombre: 'Introducción a la programación', req: [] },
-      { id: 'IC1803', nombre: 'Taller de programación', req: [] },
-      { id: 'IC2101', nombre: 'Programación orientada a objetos', req: ['IC1802', 'IC1803'] },
-      { id: 'IC2001', nombre: 'Estructuras de datos', req: [] },
-      { id: 'IC3002', nombre: 'Análisis de algoritmos', req: ['IC2001', 'MA1102'] },
-      { id: 'IC4301', nombre: 'Bases de datos I', req: ['IC2001'] },
-      { id: 'IC4302', nombre: 'Bases de datos II', req: ['IC4301'] },
-      { id: 'IC7841', nombre: 'Proyecto de ingeniería de software', req: ['IC4302'] },
-    ];
-
-    const aprobados = new Set(JSON.parse(localStorage.getItem('aprobados') || '[]'));
-
-    function render() {
-      const cont = document.getElementById('malla');
-      cont.innerHTML = '';
-
-      cursos.forEach(curso => {
-        const aprobado = aprobados.has(curso.id);
-        const desbloqueado = curso.req.every(r => aprobados.has(r));
-
-        let color = 'bg-red-200';
-        let estado = 'Bloqueado';
-
-        if (desbloqueado) {
-          color = 'bg-yellow-200';
-          estado = 'Disponible';
-        }
-        if (aprobado) {
-          color = 'bg-green-300';
-          estado = 'Aprobado';
-        }
-
-        const card = document.createElement('div');
-        card.className = `p-4 rounded-xl shadow ${color}`;
-        card.innerHTML = `
-          <h2 class="font-bold">${curso.id}</h2>
-          <p class="text-sm">${curso.nombre}</p>
-          <p class="text-xs mt-2">Estado: <b>${estado}</b></p>
-          <button class="mt-3 px-3 py-1 bg-black text-white rounded text-sm">Marcar aprobado</button>
-        `;
-
-        card.querySelector('button').onclick = () => {
-          aprobados.add(curso.id);
-          localStorage.setItem('aprobados', JSON.stringify([...aprobados]));
-          render();
-        };
-
-        cont.appendChild(card);
-      });
-    }
-
-    render();
-  </script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+<script>render();</script>
 
 </body>
 </html>
