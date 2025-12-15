@@ -1,3 +1,23 @@
+let aprobados = new Set(
+  JSON.parse(localStorage.getItem("aprobados")) || []
+);
+
+function estaDisponible(curso) {
+  return curso.requisitos.every(r => aprobados.has(r));
+}
+
+function aprobarCurso(codigo) {
+  aprobados.add(codigo);
+  localStorage.setItem("aprobados", JSON.stringify([...aprobados]));
+  render();
+}
+
+function reiniciar() {
+  localStorage.removeItem("aprobados");
+  aprobados.clear();
+  render();
+}
+
 function render() {
   const malla = document.getElementById("malla");
   malla.innerHTML = "";
@@ -43,3 +63,4 @@ function render() {
     malla.appendChild(bloqueDiv);
   });
 }
+
