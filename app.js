@@ -1,4 +1,17 @@
 let estados = JSON.parse(localStorage.getItem("estados")) || {};
+const ESTADOS = {
+  BLOQUEADO: "bloqueado",
+  PENDIENTE: "pendiente",
+  EN_CURSO: "en_curso",
+  APROBADO: "aprobado"
+};
+function requisitosAprobados(curso) {
+  return curso.requisitos.every(r => estados[r] === ESTADOS.APROBADO);
+}
+
+function estaDesbloqueado(curso) {
+  return requisitosAprobados(curso);
+}
 
 
 function estaDisponible(curso) {
@@ -7,22 +20,25 @@ function estaDisponible(curso) {
   return reqOk && coReqOk;
 }
 
-function aprobarCurso(codigo) {
+function cambiarEstado(codigo, nuevoEstado) {
+  estados[codigo] = nuevoEstado;
+
   const curso = cursos.find(c => c.codigo === codigo);
 
-  aprobados.add(codigo);
+  if (nuevoEstado === ESTADOS.APROBADO) {
+    curso.correquisitos.forEach(c => {
+      estados[c] = ESTADOS.APROBADO;
+    });
+  }
 
-  // aprobar correquisitos automáticamente
-  curso.correquisitos.forEach(c => aprobados.add(c));
-
-  localStorage.setItem("aprobados", JSON.stringify([...aprobados]));
+  localStorage.setItem("estados", JSON.stringify(estados));
   render();
 }
 
 
 function reiniciar() {
-  localStorage.removeItem("aprobados");
-  aprobados.clear();
+  localStorage.removeItem("estados");
+  estados = {};
   render();
 }
 
@@ -37,40 +53,50 @@ function render() {
     bloqueDiv.classList.add("bloque");
 
     const titulo = document.createElement("h2");
-    titulo.textContent = `Bloque ${numBloque}`;
+    titulo.textContent = `📦 Bloque ${numBloque}`;
     bloqueDiv.appendChild(titulo);
 
     const cursosDiv = document.createElement("div");
     cursosDiv.classList.add("cursos-bloque");
 
-    cursos
-      .filter(c => c.bloque === numBloque)
-      .forEach(curso => {
-        const div = document.createElement("div");
-        div.classList.add("curso");
-        
-        if (curso.correquisitos.length > 0) {
-          div.classList.add("coodependiente");
-        }
+    cursos.filter(c => c.bloque === numBloque).forEach(curso => {
+      const div = document.createElement("div");
+      div.classList.add("curso");
 
+      // coodependiente
+      if (curso.correquisitos.length > 0) {
+        div.classList.add("coodependiente");
+        div.title = `Debe llevarse junto a: ${curso.correquisitos.join(", ")}`;
+      }
 
-        if (aprobados.has(curso.codigo)) {
-          div.classList.add("aprobado");
-        } else if (estaDisponible(curso)) {
-          div.classList.add("disponible");
-          div.onclick = () => aprobarCurso(curso.codigo);
-        } else {
-          div.classList.add("bloqueado");
-        }
+      let estadoActual = estados[curso.codigo];
 
-        div.innerHTML = `
-          <strong>${curso.codigo}</strong><br>
-          ${curso.nombre}
-          <div class="creditos">🎓 Créditos: ${curso.creditos}</div>
-        `;
+      if (!estaDesbloqueado(curso)) {
+        estadoActual = ESTADOS.BLOQUEADO;
+      }
 
-        cursosDiv.appendChild(div);
-      });
+      if (!estadoActual && estaDesbloqueado(curso)) {
+        estadoActual = ESTADOS.PENDIENTE;
+      }
+
+      div.classList.add(estadoActual);
+
+      if (estadoActual === ESTADOS.PENDIENTE) {
+        div.onclick = () => cambiarEstado(curso.codigo, ESTADOS.EN_CURSO);
+      }
+
+      if (estadoActual === ESTADOS.EN_CURSO) {
+        div.onclick = () => cambiarEstado(curso.codigo, ESTADOS.APROBADO);
+      }
+
+      div.innerHTML = `
+        <strong>${curso.codigo}</strong><br>
+        ${curso.nombre}
+        <div class="creditos">🎓 Créditos: ${curso.creditos}</div>
+      `;
+
+      cursosDiv.appendChild(div);
+    });
 
     bloqueDiv.appendChild(cursosDiv);
     malla.appendChild(bloqueDiv);
