@@ -29,7 +29,7 @@ function render() {
     bloqueDiv.classList.add("bloque");
 
     const titulo = document.createElement("h2");
-    titulo.textContent = `📦 Bloque ${numBloque}`;
+    titulo.textContent = `Bloque ${numBloque}`;
     bloqueDiv.appendChild(titulo);
 
     const cursosDiv = document.createElement("div");
