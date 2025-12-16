@@ -3,14 +3,23 @@ let aprobados = new Set(
 );
 
 function estaDisponible(curso) {
-  return curso.requisitos.every(r => aprobados.has(r));
+  const reqOk = curso.requisitos.every(r => aprobados.has(r));
+  const coReqOk = cumpleCorrequisitos(curso);
+  return reqOk && coReqOk;
 }
 
 function aprobarCurso(codigo) {
+  const curso = cursos.find(c => c.codigo === codigo);
+
   aprobados.add(codigo);
+
+  // aprobar correquisitos automáticamente
+  curso.correquisitos.forEach(c => aprobados.add(c));
+
   localStorage.setItem("aprobados", JSON.stringify([...aprobados]));
   render();
 }
+
 
 function reiniciar() {
   localStorage.removeItem("aprobados");
@@ -64,3 +73,8 @@ function render() {
   });
 }
 
+function cumpleCorrequisitos(curso) {
+  return curso.correquisitos.every(c => 
+    aprobados.has(c) || estaDisponible(cursos.find(x => x.codigo === c))
+  );
+}
