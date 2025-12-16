@@ -53,7 +53,7 @@ function render() {
     bloqueDiv.classList.add("bloque");
 
     const titulo = document.createElement("h2");
-    titulo.textContent = `📦 Bloque ${numBloque}`;
+    titulo.textContent = `Bloque ${numBloque}`;
     bloqueDiv.appendChild(titulo);
 
     const cursosDiv = document.createElement("div");
@@ -66,7 +66,14 @@ function render() {
       // coodependiente
       if (curso.correquisitos.length > 0) {
         div.classList.add("coodependiente");
-        div.title = `Debe llevarse junto a: ${curso.correquisitos.join(", ")}`;
+      
+        const coText = document.createElement("div");
+        coText.classList.add("correquisitos-texto");
+        coText.innerHTML = `🔗 Correquisito con: <strong>${curso.correquisitos.join(", ")}</strong>`;
+        div.appendChild(coText);
+      
+        div.onmouseenter = () => resaltarCorrequisitos(curso.codigo, true);
+        div.onmouseleave = () => resaltarCorrequisitos(curso.codigo, false);
       }
 
       let estadoActual = estados[curso.codigo];
