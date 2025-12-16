@@ -88,13 +88,9 @@ function render() {
       }
 
       div.classList.add(estadoActual);
-
-      if (estadoActual === ESTADOS.PENDIENTE) {
-        div.onclick = () => cambiarEstado(curso.codigo, ESTADOS.EN_CURSO);
-      }
-
-      if (estadoActual === ESTADOS.EN_CURSO) {
-        div.onclick = () => cambiarEstado(curso.codigo, ESTADOS.APROBADO);
+      
+      if (estadoActual !== ESTADOS.BLOQUEADO) {
+        div.onclick = () => alternarEstado(curso.codigo);
       }
 
       div.innerHTML = `
@@ -128,3 +124,29 @@ function resaltarCorrequisitos(codigo, activar) {
     }
   });
 }
+
+
+function alternarEstado(codigo) {
+  const actual = estados[codigo] || ESTADOS.PENDIENTE;
+
+  let siguiente;
+
+  switch (actual) {
+    case ESTADOS.PENDIENTE:
+      siguiente = ESTADOS.EN_CURSO;
+      break;
+    case ESTADOS.EN_CURSO:
+      siguiente = ESTADOS.APROBADO;
+      break;
+    case ESTADOS.APROBADO:
+      siguiente = ESTADOS.PENDIENTE;
+      break;
+    default:
+      siguiente = ESTADOS.PENDIENTE;
+  }
+
+  estados[codigo] = siguiente;
+  localStorage.setItem("estados", JSON.stringify(estados));
+  render();
+}
+
