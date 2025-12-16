@@ -58,6 +58,7 @@ function render() {
 
     const cursosDiv = document.createElement("div");
     cursosDiv.classList.add("cursos-bloque");
+    div.dataset.codigo = curso.codigo;
 
     cursos.filter(c => c.bloque === numBloque).forEach(curso => {
       const div = document.createElement("div");
@@ -114,4 +115,16 @@ function cumpleCorrequisitos(curso) {
   return curso.correquisitos.every(c => 
     aprobados.has(c) || estaDisponible(cursos.find(x => x.codigo === c))
   );
+}
+
+function resaltarCorrequisitos(codigo, activar) {
+  const curso = cursos.find(c => c.codigo === codigo);
+  if (!curso) return;
+
+  curso.correquisitos.forEach(cod => {
+    const elem = document.querySelector(`[data-codigo="${cod}"]`);
+    if (elem) {
+      elem.style.outline = activar ? "3px solid #00bfff" : "none";
+    }
+  });
 }
