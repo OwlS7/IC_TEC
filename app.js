@@ -49,6 +49,11 @@ function render() {
       .forEach(curso => {
         const div = document.createElement("div");
         div.classList.add("curso");
+        
+        if (curso.correquisitos.length > 0) {
+          div.classList.add("coodependiente");
+        }
+
 
         if (aprobados.has(curso.codigo)) {
           div.classList.add("aprobado");
