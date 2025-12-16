@@ -1,6 +1,5 @@
-let aprobados = new Set(
-  JSON.parse(localStorage.getItem("aprobados")) || []
-);
+let estados = JSON.parse(localStorage.getItem("estados")) || {};
+
 
 function estaDisponible(curso) {
   const reqOk = curso.requisitos.every(r => aprobados.has(r));
